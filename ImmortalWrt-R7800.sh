@@ -22,13 +22,14 @@ touch ./.config
 
 # 编译者信息
 cat >> .config <<EOF
-CONFIG_KERNEL_BUILD_USER="Evi5"
-CONFIG_KERNEL_BUILD_DOMAIN="GitHub Actions @ Evi5"
+CONFIG_KERNEL_BUILD_USER="CodeEagle"
+CONFIG_KERNEL_BUILD_DOMAIN="GitHub Actions @ CodeEagle"
 EOF
 
 # 编译R7800固件:
 cat >> .config <<EOF
 CONFIG_TARGET_ipq806x=y
+CONFIG_TARGET_ipq806x_generic=y
 CONFIG_TARGET_ipq806x_generic_DEVICE_netgear_r7800=y
 EOF
 
@@ -36,6 +37,8 @@ EOF
 cat >> .config <<EOF
 CONFIG_PACKAGE_dnsmasq_full_dhcpv6=y
 CONFIG_PACKAGE_ipv6helper=y
+CONFIG_PACKAGE_6in4=y
+CONFIG_PACKAGE_6rd=y
 EOF
 
 # 多文件系统支持:
@@ -51,20 +54,11 @@ EOF
 
 # USB3.0支持:
 cat >> .config <<EOF
-# CONFIG_PACKAGE_kmod-usb-ohci=y
-# CONFIG_PACKAGE_kmod-usb-ohci-pci=y
-# CONFIG_PACKAGE_kmod-usb2=y
-# CONFIG_PACKAGE_kmod-usb2-pci=y
-# CONFIG_PACKAGE_kmod-usb3=y
-# CONFIG_PACKAGE_kmod-usb-storage=y
-# CONFIG_PACKAGE_kmod-usb-uhci=y
-# CONFIG_PACKAGE_kmod-usb-storage-uas=y
-# CONFIG_PACKAGE_usbutils=y
-# CONFIG_PACKAGE_kmod-usb-storage=y
-# CONFIG_PACKAGE_kmod-usb-storage-extras=y
-# CONFIG_PACKAGE_kmod-nls-cp437=y
-# CONFIG_PACKAGE_kmod-nls-iso8859-1=y
-# CONFIG_PACKAGE_block-mount=y
+CONFIG_PACKAGE_kmod-usb-ohci=y
+CONFIG_PACKAGE_kmod-usb-ohci-pci=y
+CONFIG_PACKAGE_kmod-usb2=y
+CONFIG_PACKAGE_kmod-usb2-pci=y
+CONFIG_PACKAGE_kmod-usb3=y
 EOF
 
 # smaba4支持, luci-app-samba内置与smaba4冲突
@@ -89,18 +83,18 @@ EOF
 
 # SSR-Plus插件:
 cat >> .config <<EOF
-CONFIG_PACKAGE_luci-app-ssr-plus=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
-#CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_NaiveProxy is not set
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Redsocks2=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Server=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Simple_Obfs=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray_Plugin=y
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Xray=y
+# CONFIG_PACKAGE_luci-app-ssr-plus=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Kcptun=y
+# #CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_NaiveProxy is not set
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Redsocks2=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Shadowsocks=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ShadowsocksR_Server=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Simple_Obfs=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Trojan=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray_Plugin=y
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Xray=y
 EOF
 
 # Passwall插件
@@ -136,14 +130,16 @@ cat >> .config <<EOF
 # CONFIG_PACKAGE_luci-app-turboacc_INCLUDE_dnsforwarder=y
 # CONFIG_PACKAGE_luci-app-arpbind=y #IP/MAC绑定
 # CONFIG_PACKAGE_luci-app-jd-dailybonus=y #京东签到服务
-# CONFIG_PACKAGE_luci-app-adblock=y #ADB广告过滤
+CONFIG_PACKAGE_luci-app-adblock=y #ADB广告过滤
 # CONFIG_PACKAGE_luci-app-baidupcs-web=y #百度网盘管理
 # CONFIG_PACKAGE_luci-app-fileassistant=y #文件助手
 EOF
 
 # 常用LuCI插件:
 cat >> .config <<EOF
-# CONFIG_PACKAGE_luci-app-adbyby-plus=y #adbyby去广告
+CONFIG_PACKAGE_luci-app-adguardhome=y
+CONFIG_PACKAGE_luci-app-adbyby-plus=y #adbyby去广告
+CONFIG_PACKAGE_luci-app-vlmcsd=y #KMS激活服务器
 # CONFIG_PACKAGE_luci-app-webadmin=y #Web管理页面设置
 # CONFIG_PACKAGE_luci-app-filetransfer=y #系统-文件传输
 # CONFIG_PACKAGE_luci-app-qos-gargoyle=y #Gargoyle QoS流控

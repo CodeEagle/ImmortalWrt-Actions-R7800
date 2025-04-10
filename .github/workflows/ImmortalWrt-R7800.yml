@@ -2,12 +2,12 @@
 
 name: ImmortalWrt-R7800
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
-  push: 
-    branches: 
-       - main
+  push:
+    branches:
+      - main
   # pull_request:
   #   branches: [ main ]
 
@@ -18,26 +18,27 @@ env:
   # 源
   REPO_URL: https://github.com/immortalwrt/immortalwrt
   # 分支
-  REPO_BRANCH: openwrt-18.06
+  REPO_BRANCH: openwrt-24.10
   # 脚本
   DIY_SH: ImmortalWrt-R7800.sh
+  DIY_P1_SH: diy-part1.sh
   # 上传分支
   UPLOAD_BRANCH: true
   # 分支
-  BRANCH: R7800
+  BRANCH: R7800-ImmortalWrt
   # Github 用户名
-  GITHUB_USER_NAME: Evi5
+  GITHUB_USER_NAME: CodeEagle
   # Github 邮箱
   GITHUB_USER_EMAIL: ${{ secrets.EMAIL }}
   # Github
-  GITHUB: github.com/Evi5/ImmortalWrt-Actions-R7800.git
+  GITHUB: github.com/CodeEagle/ImmortalWrt-Actions-R7800.git
   # 上传固件
   UPLOAD_FIRMWARE: true
   # 创建+上传发布
   CREATE_RELEASE: true
   # 编译者
-  BUILD_USER: Evi5
-  
+  BUILD_USER: CodeEagle
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -52,7 +53,7 @@ jobs:
         with:
           root-reserve-mb: 512
           swap-size-mb: 1024
-          remove-dotnet: 'true'
+          remove-dotnet: "true"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -78,16 +79,23 @@ jobs:
           git clone -b $REPO_BRANCH --single-branch $REPO_URL
           cd immortalwrt
 
+      - name: Load custom feeds
+        working-directory: ./immortalwrt
+        run: |
+          [ -e $FEEDS_CONF ] && mv $FEEDS_CONF feeds.conf.default
+          chmod +x $DIY_P1_SH        
+          $GITHUB_WORKSPACE/$DIY_P1_SH
+
       - name: Update Feeds
         working-directory: ./immortalwrt
-        run:  |
+        run: |
           ./scripts/feeds clean
           ./scripts/feeds update -a
 
       # 安装源
       - name: Install Feeds
         working-directory: ./immortalwrt
-        run:  ./scripts/feeds install -a
+        run: ./scripts/feeds install -a
 
       # 加载自定义配置文件
       - name: Load Custom Configuration
@@ -116,7 +124,7 @@ jobs:
           # NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
 
-          # This password you will use when authorizing via SSH 
+          # This password you will use when authorizing via SSH
           # USER_PASS: ${{ secrets.USER_PASS }}
           USER_PASS: murAmur
           if: env.SSH_ACTIONS == 'true'
@@ -125,20 +133,19 @@ jobs:
         if: ${{ failure() }}
         run: sleep 1h # Prevent to killing instance after failure
 
-
       # 上传到分支 By yfdoor
       - name: Upload Branch
         env:
-            GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-            cd immortalwrt/bin
-            git init
-            git config user.name $GITHUB_USER_NAME
-            git config user.email $GITHUB_USER_EMAIL
-            git add .
-            git commit -m "Update ImmortalWrt"$BRANCH
-            git push --force --quiet https://${{ secrets.RELEASE_TOKEN }}@$GITHUB HEAD:ImmortalWrt-$BRANCH
-    
+          cd immortalwrt/bin
+          git init
+          git config user.name $GITHUB_USER_NAME
+          git config user.email $GITHUB_USER_EMAIL
+          git add .
+          git commit -m "Update ImmortalWrt"$BRANCH
+          git push --force --quiet https://${{ secrets.RELEASE_TOKEN }}@$GITHUB HEAD:ImmortalWrt-$BRANCH
+
       # 整理文件
       - name: Organize Files
         id: organize
@@ -153,12 +160,12 @@ jobs:
           rm -rf *.buildinfo
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
           echo "::set-output name=status::success"
-    
-      - name: 删除旧的Artifacts	
-        uses: c-hive/gha-remove-artifacts@v1.2.0	
-        with:	
-          age: '1 day'	
-          skip-recent: 3	
+
+      - name: 删除旧的Artifacts
+        uses: c-hive/gha-remove-artifacts@v1.2.0
+        with:
+          age: "1 day"
+          skip-recent: 3
 
       # 生成标签
       - name: Generate Tag
@@ -167,7 +174,7 @@ jobs:
         run: |
           echo "RELEASE_TAG=$(TZ=UTC-8 date +"%Y-%m-%d")" >> $GITHUB_ENV
           echo "::set-output name=status::success"
-    
+
       # 发行固件
       - name: Upload Firmware To Release
         uses: softprops/action-gh-release@v1
@@ -177,12 +184,12 @@ jobs:
         with:
           name: Netgear ${{ env.BRANCH }} 🚀 | 编译 / ${{ env.RELEASE_TAG }}
           tag_name: ${{ env.RELEASE_TAG }}
-          body: |            
-              1、固件源码：${{ env.REPO_URL }}
-              -- Build by ${{ env.BUILD_USER }} @ with Github Action on ${{ env.RELEASE_TAG }}
-              当前使用版本:（
-              ${{ env.useVersionInfo }}
-              ${{ github.event.commits[0].message }}
+          body: |
+            1、固件源码：${{ env.REPO_URL }}
+            -- Build by ${{ env.BUILD_USER }} @ with Github Action on ${{ env.RELEASE_TAG }}
+            当前使用版本:（
+            ${{ env.useVersionInfo }}
+            ${{ github.event.commits[0].message }}
           files: ${{ env.FIRMWARE }}/*
 
       - name: 删除旧的Releases
@@ -192,4 +199,3 @@ jobs:
           delete_tags: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
